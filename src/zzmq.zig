@@ -11,6 +11,7 @@ pub const ZSocket = zsocket.ZSocket;
 pub const ZSocketType = zsocket.ZSocketType;
 pub const ZSocketOption = zsocket.ZSocketOption;
 pub const ZMessageReceived = zsocket.ZMessageReceived;
+pub const ZSocketFlag = zsocket.ZSocketFlag;
 
 pub const ZMessage = zmessage.ZMessage;
 

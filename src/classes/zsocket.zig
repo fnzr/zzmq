@@ -132,6 +132,11 @@ pub const ZSocketType = enum(c_int) {
     Push = c.ZMQ_PUSH,
 };
 
+pub const ZSocketFlag = enum(c_int) {
+    PollIn = c.ZMQ_POLLIN,
+    PollOut = c.ZMQ_POLLOUT,
+};
+
 pub const ZSocketOption = union(enum) {
     /// ZMQ_RCVTIMEO: Maximum time before a recv operation returns with EAGAIN
     ///
@@ -271,6 +276,9 @@ pub const ZSocketOption = union(enum) {
     ///
     /// For more details, see https://libzmq.readthedocs.io/en/latest/zmq_setsockopt.html
     RouterHandover: bool,
+
+    Fd: i32,
+    Events: ZSocketFlag,
 };
 
 /// System level socket, which allows for opening outgoing and
@@ -544,8 +552,11 @@ pub const ZSocket = struct {
 
                 result = c.zmq_setsockopt(self.socket_, c.ZMQ_ROUTER_HANDOVER, &v, @sizeOf(@TypeOf(v)));
             },
+            .Events => {
+                result = c.zmq_setsockopt(self.socket_, c.ZMQ_EVENTS, &opt.Events, @sizeOf(@TypeOf(opt.Events)));
+            },
 
-            //else => return error.UnknownOption,
+            else => return error.UnknownOption,
         }
 
         if (result < 0) {
@@ -609,6 +620,15 @@ pub const ZSocket = struct {
                 return error.UnknownOption; // ZMQ_ROUTER_HANDOVER cannot be retrieved
             },
 
+            .Fd => {
+                var length: usize = @sizeOf(@TypeOf(opt.Fd));
+                result = c.zmq_getsockopt(self.socket_, c.ZMQ_FD, &opt.Fd, &length);
+            },
+
+            .Events => {
+                var length: usize = @sizeOf(@TypeOf(opt.Events));
+                result = c.zmq_getsockopt(self.socket_, c.ZMQ_EVENTS, &opt.Events, &length);
+            },
             //else => return error.UnknownOption,
         }
 
