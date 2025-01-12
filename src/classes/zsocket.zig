@@ -277,7 +277,28 @@ pub const ZSocketOption = union(enum) {
     /// For more details, see https://libzmq.readthedocs.io/en/latest/zmq_setsockopt.html
     RouterHandover: bool,
 
+    /// ZMQ_FD: retrieve file descriptor associated with the socket
+    ///
+    /// The ZMQ_FD option shall retrieve the file descriptor associated with the specified socket.
+    /// The returned file descriptor can be used to integrate the socket into an existing event loop;
+    /// the 0MQ library shall signal any pending events on the socket in an edge-triggered fashion
+    /// by making the file descriptor become ready for reading.
+    ///
+    /// NOTE: The ability to read from the returned file descriptor does not necessarily indicate
+    /// that messages are available to be read from, or can be written to, the underlying socket.
+    ///
+    /// The returned file descriptor is intended for use with a poll or similar system call only.
+    /// Applications must never attempt to read or write data to it directly, neither should
+    /// they try to close it.
+    ///
+    /// For more details, see https://libzmq.readthedocs.io/en/latest/zmq_getsockopt.html
     Fd: i32,
+
+    /// ZMQ_EVENTS: Retrieve socket event state
+    ///
+    /// The ZMQ_EVENTS option shall retrieve the event state for the specified socket.
+    ///
+    /// For more details, see https://libzmq.readthedocs.io/en/latest/zmq_getsockopt.html
     Events: ZSocketFlag,
 };
 
