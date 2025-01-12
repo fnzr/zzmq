@@ -20,7 +20,7 @@ const ZMessageType = enum {
 };
 
 const ZMessageImpl = union(ZMessageType) {
-    Internal: ZMessageInternal,
+    Internal: *ZMessageInternal,
     External: ZMessageExternal,
 };
 
@@ -31,8 +31,11 @@ pub const ZMessage = struct {
     ///
     /// The data is being copied into the message.
     pub fn init(allocator: std.mem.Allocator, d: []const u8) !ZMessage {
+        const internal = try allocator.create(ZMessageInternal);
+        internal.* = try ZMessageInternal.init(allocator, d);
+
         return .{ .impl_ = .{
-            .Internal = try ZMessageInternal.init(allocator, d),
+            .Internal = internal,
         } };
     }
 
@@ -186,6 +189,7 @@ const ZMessageInternal = struct {
         if (prev == 1) { // it's now zero
             if (self.allocator_) |a| {
                 a.free(self.data_);
+                a.destroy(self);
             }
         }
     }
