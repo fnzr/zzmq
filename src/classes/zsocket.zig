@@ -573,11 +573,11 @@ pub const ZSocket = struct {
 
                 result = c.zmq_setsockopt(self.socket_, c.ZMQ_ROUTER_HANDOVER, &v, @sizeOf(@TypeOf(v)));
             },
-            .Events => {
-                result = c.zmq_setsockopt(self.socket_, c.ZMQ_EVENTS, &opt.Events, @sizeOf(@TypeOf(opt.Events)));
+            .Events, .Fd => {
+                return error.NotSupported;
             },
 
-            else => return error.UnknownOption,
+            // else => return error.UnknownOption,
         }
 
         if (result < 0) {
@@ -650,6 +650,7 @@ pub const ZSocket = struct {
                 var length: usize = @sizeOf(@TypeOf(opt.Events));
                 result = c.zmq_getsockopt(self.socket_, c.ZMQ_EVENTS, &opt.Events, &length);
             },
+
             //else => return error.UnknownOption,
         }
 
